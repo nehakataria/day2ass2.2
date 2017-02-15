@@ -1,0 +1,66 @@
+Q1.HDFS
+A. The Hadoop Distributed File System (HDFS) is a distributed file system designed to run on commodity hardware.
+It has many similarities with existing distributed file systems. However, the differences from other distributed file systems
+are significant. HDFS is highly fault-tolerant and is designed to be deployed on low-cost hardware. 
+HDFS provides high throughput access to application data and is suitable for applications that have large data sets.
+HDFS relaxes a few POSIX requirements to enable streaming access to file system data. HDFS was originally built as infrastructure
+for the Apache Nutch web search engine project. HDFS is now an Apache Hadoop sub project.
+Assumptions in HDFS
+1.Hardware Failure:
+Hardware failure is the norm rather than the exception. An HDFS instance may consist of hundreds or thousands of server machines,
+each storing part of the file system’s data. The fact that there are a huge number of components and that each component has
+a non-trivial probability of failure means that some component of HDFS is always non-functional. Therefore, detection of faults
+and quick, automatic recovery from them is a core architectural goal of HDFS.
+2.Streaming Data Access:
+Applications that run on HDFS need streaming access to their data sets. They are not general purpose applications that typically
+run on general purpose file systems. HDFS is designed more for batch processing rather than interactive use by users.
+The emphasis is on high throughput of data access rather than low latency of data access. POSIX imposes many hard requirements 
+that are not needed for applications that are targeted for HDFS. POSIX semantics in a few key areas has been traded to increase data
+throughput rates.
+3.Large Data Sets:
+Applications that run on HDFS have large data sets. A typical file in HDFS is gigabytes to terabytes in size. Thus, HDFS is tuned
+to support large files. It should provide high aggregate data bandwidth and scale to hundreds of nodes in a single cluster.
+It should support tens of millions of files in a single instance.
+4.Portability Across Heterogeneous Hardware and Software Platforms:
+HDFS has been designed to be easily portable from one platform to another. This facilitates widespread adoption of HDFS as a platform
+of choice for a large set of applications.
+
+Q2.Hadoop cluster ?
+A2.The three major categories of machine roles in a Hadoop deployment are Client machines, Masters nodes, and Slave nodes.
+The Master nodes oversee the two key functional pieces that make up Hadoop: storing lots of data (HDFS), and running parallel
+computations on all that data (Map Reduce). The Name Node oversees and coordinates the data storage function (HDFS), 
+while the Job Tracker oversees and coordinates the parallel processing of data using Map Reduce. Slave Nodes make up the 
+vast majority of machines and do all the dirty work of storing the data and running the computations. Each slave runs
+both a Data Node and Task Tracker daemon that communicate with and receive instructions from their master nodes. The Task 
+Tracker daemon is a slave to the Job Tracker, the Data Node daemon a slave to the Name Node.
+
+Client machines have Hadoop installed with all the cluster settings, but are neither a Master or a Slave.
+Instead, the role of the Client machine is to load data into the cluster, submit Map Reduce jobs describing how
+that data should be processed, and then retrieve or view the results of the job when its finished. In smaller clusters 
+(~40 nodes) you may have a single physical server playing multiple roles, such as both Job Tracker and Name Node. With medium
+to large clusters you will often have each role operating on a single server machine.
+
+In real production clusters there is no server virtualization, no hypervisor layer. That would only amount to unnecessary 
+overhead impeding performance. Hadoop runs best on Linux machines, working directly with the underlying hardware. That said, 
+Hadoop does work in a virtual machine. That’s a great way to learn and get Hadoop up and running fast and cheap. I have a 6-node
+cluster up and running in VMware Workstation on my Windows 7 laptop.
+
+Q3.HDFS blocks?
+A3. A block is the smallest unit of data that can be stored or retrieved from the disk. Filesystems deal with the data
+stored in blocks. Filesystem blocks are normally in few kilobytes of size. Blocks are transparent to the user who is performing 
+filesystem operations like read and write.
+HDFS Block:
+Hadoop distributed file system also stores the data in terms of blocks. However the block size in HDFS is very large.
+The default size of HDFS block is 64MB. The files are split into 64MB blocks and then stored into the hadoop filesystem. 
+The hadoop application is responsible for distributing the data blocks across multiple nodes. 
+
+Advantages of HDFS Block 
+1.The blocks are of fixed size, so it is very easy to calculate the number of blocks that can be stored on a disk.
+2.HDFS block concept simplifies the storage of the datanodes. 
+3.The datanodes doesn’t need to concern about the blocks metadata data like file permissions etc. 
+4.The namenode maintains the metadata of all the blocks.
+5.If the size of the file is less than the HDFS block size, then the file does not occupy the complete block storage.
+6.As the file is chunked into blocks, it is easy to store a file that is larger than the disk size as the data blocksare distributed
+and stored on multiple nodes in a hadoop cluster.
+Blocks are easy to replicate between the datanodes and thus provide fault tolerance and high availability. Hadoop framework replicates each block across multiple nodes (default replication factor is 3). In case of any node failure or block corruption, the same block can be read from another node.
+
